@@ -31,6 +31,8 @@ RUN apt-get update && \
   docker-php-ext-install intl pdo_mysql mbstring zip bcmath && \
   composer config -g process-timeout 3600 && \
   composer config -g repos.packagist composer https://packagist.org && \
+  pecl install xdebug && \
+  docker-php-ext-enable xdebug && \
   composer global require hirak/prestissimo
 
 COPY ./php-fpm.d/zzz-www.conf /usr/local/etc/php-fpm.d/zzz-www.conf
