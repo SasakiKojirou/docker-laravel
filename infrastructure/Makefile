@@ -1,5 +1,6 @@
 uid=$$(id -u $$USER)
 gid=$$(id -g $$USER)
+version=7
 up:
 	docker-compose up -d
 build:
@@ -19,6 +20,10 @@ install-recommend-packages:
 	docker-compose exec -u $(uid):$(gid) app composer require --dev roave/security-advisories:dev-master
 	docker-compose exec -u $(uid):$(gid) app php artisan vendor:publish --provider="BeyondCode\DumpServer\DumpServerServiceProvider"
 	docker-compose exec -u $(uid):$(gid) app php artisan vendor:publish --provider="Barryvdh\Debugbar\ServiceProvider"
+install-ja:
+	docker-compose exec -u $(uid):$(gid) app php -r "copy('https://readouble.com/laravel/$(version).x/ja/install-ja-lang-files.php', 'install-ja-lang.php');"
+	docker-compose exec -u $(uid):$(gid) app php -f install-ja-lang.php
+	docker-compose exec -u $(uid):$(gid) app php -r "unlink('install-ja-lang.php');"
 init:
 	docker-compose up -d --build
 	docker-compose exec app chown -R $(uid):$(gid) /composer
