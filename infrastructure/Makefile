@@ -68,6 +68,8 @@ seed:
 rollback-test:
 	docker-compose exec app php artisan migrate:fresh
 	docker-compose exec app php artisan migrate:refresh
+reset:
+	docker-compose exec app php artisan migrate:reset
 tinker:
 	docker-compose exec app php artisan tinker
 test:
