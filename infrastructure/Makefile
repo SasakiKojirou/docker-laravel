@@ -1,3 +1,5 @@
+uid=$$(id -u $$USER)
+gid=$$(id -g $$USER)
 up:
 	docker-compose up -d
 build:
@@ -5,23 +7,27 @@ build:
 create-project:
 	@make build
 	@make up
-	docker-compose exec app composer create-project --prefer-dist laravel/laravel .
+	docker-compose exec app chown -R $(uid):$(gid) /composer
+	docker-compose exec app chown -R $(uid):$(gid) /work/backend
+	docker-compose exec -u $(uid):$(gid) app composer create-project --prefer-dist laravel/laravel .
 	docker-compose exec app chmod -R 777 storage bootstrap/cache
 install-recommend-packages:
-	docker-compose exec app composer require doctrine/dbal
-	docker-compose exec app composer require --dev barryvdh/laravel-ide-helper
-	docker-compose exec app composer require --dev beyondcode/laravel-dump-server
-	docker-compose exec app composer require --dev barryvdh/laravel-debugbar
-	docker-compose exec app composer require --dev roave/security-advisories:dev-master
-	docker-compose exec app php artisan vendor:publish --provider="BeyondCode\DumpServer\DumpServerServiceProvider"
-	docker-compose exec app php artisan vendor:publish --provider="Barryvdh\Debugbar\ServiceProvider"
+	docker-compose exec -u $(uid):$(gid) app composer require doctrine/dbal
+	docker-compose exec -u $(uid):$(gid) app composer require --dev barryvdh/laravel-ide-helper
+	docker-compose exec -u $(uid):$(gid) app composer require --dev beyondcode/laravel-dump-server
+	docker-compose exec -u $(uid):$(gid) app composer require --dev barryvdh/laravel-debugbar
+	docker-compose exec -u $(uid):$(gid) app composer require --dev roave/security-advisories:dev-master
+	docker-compose exec -u $(uid):$(gid) app php artisan vendor:publish --provider="BeyondCode\DumpServer\DumpServerServiceProvider"
+	docker-compose exec -u $(uid):$(gid) app php artisan vendor:publish --provider="Barryvdh\Debugbar\ServiceProvider"
 init:
 	docker-compose up -d --build
-	docker-compose exec app composer install
-	docker-compose exec app cp .env.example .env
-	docker-compose exec app php artisan key:generate
-	docker-compose exec app php artisan storage:link
-	docker-compose exec app php artisan migrate:fresh --seed
+	docker-compose exec app chown -R $(uid):$(gid) /composer
+	docker-compose exec app chown -R $(uid):$(gid) /work/backend
+	docker-compose exec -u $(uid):$(gid) app composer install
+	docker-compose exec -u $(uid):$(gid) app cp .env.example .env
+	docker-compose exec -u $(uid):$(gid) app php artisan key:generate
+	docker-compose exec -u $(uid):$(gid) app php artisan storage:link
+	docker-compose exec -u $(uid):$(gid) app php artisan migrate:fresh --seed
 remake:
 	@make destroy
 	@make init
@@ -44,8 +50,10 @@ logs-watch:
 	docker-compose logs --follow
 web:
 	docker-compose exec web ash
-app:
+app-root:
 	docker-compose exec app bash
+app:
+	docker-compose exec -u $(uid):$(gid) app bash
 migrate:
 	docker-compose exec app php artisan migrate
 fresh:
@@ -99,7 +107,7 @@ sql:
 redis:
 	docker-compose exec redis redis-cli
 ide-helper:
-	docker-compose exec app php artisan clear-compiled
-	docker-compose exec app php artisan ide-helper:generate
-	docker-compose exec app php artisan ide-helper:meta
-	docker-compose exec app php artisan ide-helper:models --nowrite
+	docker-compose exec -u $(uid):$(gid) app php artisan clear-compiled
+	docker-compose exec -u $(uid):$(gid) app php artisan ide-helper:generate
+	docker-compose exec -u $(uid):$(gid) app php artisan ide-helper:meta
+	docker-compose exec -u $(uid):$(gid) app php artisan ide-helper:models --nowrite

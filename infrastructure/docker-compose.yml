@@ -8,6 +8,8 @@ services:
     volumes:
       - php-fpm-socket:/var/run/php-fpm
       - ../backend:/work/backend
+      - /etc/passwd:/etc/passwd:ro
+      - /etc/group:/etc/group:ro
 
   web:
     build: ./docker/nginx
