@@ -106,8 +106,10 @@ sql:
 	docker-compose exec db bash -c 'mysql -u $$MYSQL_USER -p$$MYSQL_PASSWORD $$MYSQL_DATABASE'
 redis:
 	docker-compose exec redis redis-cli
+ide-helper-model:
+	docker-compose exec -u $(uid):$(gid) app php artisan ide-helper:models --nowrite
 ide-helper:
 	docker-compose exec -u $(uid):$(gid) app php artisan clear-compiled
 	docker-compose exec -u $(uid):$(gid) app php artisan ide-helper:generate
 	docker-compose exec -u $(uid):$(gid) app php artisan ide-helper:meta
-	docker-compose exec -u $(uid):$(gid) app php artisan ide-helper:models --nowrite
+	@make ide-helper-model
