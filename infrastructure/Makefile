@@ -32,7 +32,7 @@ init:
 	docker-compose exec -u $(uid):$(gid) app cp .env.example .env
 	docker-compose exec -u $(uid):$(gid) app php artisan key:generate
 	docker-compose exec -u $(uid):$(gid) app php artisan storage:link
-	docker-compose exec -u $(uid):$(gid) app php artisan migrate:fresh --seed
+	docker-compose exec app php artisan migrate:fresh --seed
 remake:
 	@make destroy
 	@make init
