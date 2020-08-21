@@ -25,3 +25,8 @@ services:
       - db-store:/var/lib/mysql
     ports:
       - 3306:3306
+
+  db-testing:
+    build: ./docker/mysql
+    tmpfs:
+      - /var/lib/mysql
