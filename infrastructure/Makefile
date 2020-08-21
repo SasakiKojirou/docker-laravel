@@ -73,7 +73,7 @@ reset:
 tinker:
 	docker-compose exec app php artisan tinker
 test:
-	docker-compose exec app php artisan test
+	docker-compose exec app vendor/bin/phpunit
 optimize:
 	docker-compose exec app php artisan optimize
 optimize-clear:
